@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Select Menus</title>
+  </head>
+  <body>
+    <h1>Dynamic Select Menus</h1>
+    <form id="myForm">
+      <div id="selectContainer">
+        <!-- Dynamic select menus will be added here -->
+      </div>
+      <div id="result">
+        <!-- This div will display the user's final choices dynamically -->
+      </div>
+    </form>
+
+    <script>
+      const selectContainer = document.getElementById("selectContainer");
+      const result = document.getElementById("result");
+      const options = {
+        option1: ["Sub-option 1.1", "Sub-option 1.2"],
+        option2: ["Sub-option 2.1", "Sub-option 2.2"],
+        "Sub-option 1.1": ["Final Option 1.1.1", "Final Option 1.1.2"],
+        "Sub-option 1.2": ["Final Option 1.2.1", "Final Option 1.2.2"],
+        "Sub-option 2.1": ["Final Option 2.1.1", "Final Option 2.1.2"],
+        "Sub-option 2.2": ["Final Option 2.2.1", "Final Option 2.2.2"],
+      };
+
+      // Create the initial select menu when the page loads
+      const initialOptions = Object.keys(options);
+      const select = createSelect(initialOptions);
+      selectContainer.appendChild(select);
+
+      // Function to create and populate select menus
+      function createSelect(optionsList) {
+        console.log(optionsList);
+        const select = document.createElement("select");
+        optionsList.forEach((option) => {
+          const optionElement = document.createElement("option");
+          optionElement.value = option;
+          optionElement.textContent = option;
+          select.setAttribute("onchange", "updateForm()");
+          select.appendChild(optionElement);
+        });
+        return select;
+      }
+
+      function updateForm() {
+        const selects = selectContainer.querySelectorAll("select");
+
+        // Clear only the subsequent select elements, not the first one
+        for (let i = 1; i < selects.length; i++) {
+          selectContainer.removeChild(selects[i]);
+        }
+
+        const selectedOptions = Array.from(selects)
+          .map((s) => s.value)
+          .filter(Boolean);
+        let currentOptions = options;
+
+        selectedOptions.forEach((option) => {
+          const select = createSelect(currentOptions[option]);
+          selectContainer.appendChild(select);
+          currentOptions = options[option];
+        });
+      }
+
+      // const selectElements = document.getElementsByTagName("select");
+      // // Attach the event listener to each select element
+      // for (let i = 0; i < selectElements.length; i++) {
+      //   select.addEventListener("change", (event) => {
+      //     console.log(event.target.value + " OHH BOYYYY I'VE BEEN CLICKED!");
+      //     updateForm();
+      //   });
+      // }
+
+      // select.addEventListener("change", (event) => {
+      //   console.log(event.target.value + " OHH BOYYYY I'VE BEEN CLICKED!");
+      //   updateForm();
+      // });
+    </script>
+  </body>
+</html>
