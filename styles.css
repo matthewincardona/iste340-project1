@@ -1,0 +1,54 @@
+:root {
+    --select-background: #d3d3d3;
+}
+
+body {
+    background: linear-gradient(50deg, #8484eb, #3e4fa5);
+    background-size: 12000% 12000%;
+
+    -webkit-animation: AnimationName 26s ease infinite;
+    -moz-animation: AnimationName 26s ease infinite;
+    animation: AnimationName 26s ease infinite;
+}
+
+@-webkit-keyframes AnimationName {
+    0%{background-position:0% 84%}
+    50%{background-position:100% 17%}
+    100%{background-position:0% 84%}
+}
+@-moz-keyframes AnimationName {
+    0%{background-position:0% 84%}
+    50%{background-position:100% 17%}
+    100%{background-position:0% 84%}
+}
+@keyframes AnimationName {
+    0%{background-position:0% 84%}
+    50%{background-position:100% 17%}
+    100%{background-position:0% 84%}
+}
+
+h1, h2, h3, p {
+    color: white;
+    font-family: 'Gabarito', sans-serif;
+}
+
+select {
+    background-color: var(--select-background);
+    color: black;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 5px;
+    width: 150px;
+
+  }
+
+  select option {
+    background-color: var(--select-background);
+    color: black; 
+    padding: 5px; 
+  }
+
+  #selectContainer {
+    display: flex;
+    gap: 1em;
+  }

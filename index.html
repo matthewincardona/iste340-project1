@@ -4,12 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dynamic Select Menus</title>
+  <title>Dive Selector</title>
 </head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;600&display=swap" rel="stylesheet">
 
 <body>
-  <h1>Dynamic Select Menus</h1>
-  <form id="myForm">
+  <h1>Dive Selector</h1>
+  <form id="selectForm">
     <div id="selectContainer">
       <!-- Dynamic select menus will be added here -->
     </div>
@@ -17,190 +20,8 @@
       <!-- This div will display the user's final choices dynamically -->
     </div>
   </form>
-
-  <script>
-    const selectContainer = document.getElementById("selectContainer");
-    const result = document.getElementById("result");
-
-    let resultText = document.createTextNode("");
-    result.appendChild(resultText);
-
-    const options = {
-      'Voluntary': {
-        'Front': {
-          'Dive': {
-            'Straight DD: 1.4': {},
-            'Pike DD: 1.3': {},
-            'Tuck DD: 1.2': {}
-          },
-          'Somersault': {
-            'Straight DD: 1.6': {},
-            'Pike DD: 1.5': {},
-            'Tuck DD: 1.4': {}
-          },
-          'One and a Half': {
-            'Straight DD: 2.0': {},
-            'Pike DD: 1.7': {},
-            'Tuck DD: 1.6': {}
-          },
-        },
-        'Back': {
-          'Dive': {
-            'Straight  DD: 1.7': {},
-            'Pike DD: 1.6': {},
-            'Tuck DD: 1.5': {}
-          },
-          'Somersault': {
-            'Straight DD: 1.7': {},
-            'Pike DD: 1.6': {},
-            'Tuck DD: 1.5': {}
-          },
-          'One and a Half': {
-            'Straight DD: 2.5': {},
-            'Pike DD: 2.3': {},
-            'Tuck DD: 2.0': {}
-          },
-        },
-        'Reverse': {
-          'Dive': {
-            'Straight DD: 1.8': {},
-            'Pike DD: 1.7': {},
-            'Tuck DD: 1.6': {}
-          },
-          'Somersault': {
-            'Straight DD: 1.8': {},
-            'Pike DD: 1.7': {},
-            'Tuck DD: 1.6': {}
-          },
-          'One and a Half': {
-            'Straight DD: 2.7': {},
-            'Pike DD: 2.4': {},
-            'Tuck DD: 2.1': {}
-          },
-        },
-        'Inward': {
-          'Dive': {
-            'Straight DD: 1.8': {},
-            'Pike DD: 1.5': {},
-            'Tuck DD: 1.4': {}
-          },
-          'Somersault': {
-            'Straight DD: 2.0': {},
-            'Pike DD: 1.7': {},
-            'Tuck DD: 1.6': {}
-          },
-          'One and a Half': {
-            'Pike DD: 2.4': {},
-            'Tuck DD: 2.2': {}
-          },
-        }
-      },
-      'Optional': {
-        'Front': {
-          'One and a Half': {},
-          'Double': {},
-          'Two and a Half': {},
-          'Triple': {},
-          'Three and a half': {},
-        },
-        'Back': {
-          'One and a Half': {},
-          'Double': {},
-          'Two and a Half': {},
-          'Triple': {},
-          'Three and a half': {},
-        },
-        'Reverse': {
-          'One and a Half': {},
-          'Double': {},
-          'Two and a Half': {},
-          'Triple': {},
-          'Three and a half': {},
-        },
-        'Inward': {
-          'One and a Half': {},
-          'Double': {},
-          'Two and a Half': {},
-          'Triple': {},
-          'Three and a half': {},
-        }
-      }
-
-
-    }
-
-    // Create the initial select menu when the page loads
-    const initialOptions = Object.keys(options);
-    const select = createSelect(initialOptions);
-    selectContainer.appendChild(select);
-
-    // Function to create and populate select menus
-    function createSelect(optionsList) {
-      const select = document.createElement("select");
-
-      // Add a blank option as the initial option
-      const blankOption = document.createElement("option");
-      blankOption.value = "";
-      blankOption.textContent = "Select an option";
-      select.appendChild(blankOption);
-
-      optionsList.forEach((option) => {
-        const optionElement = document.createElement("option");
-        optionElement.value = option;
-        optionElement.textContent = option;
-        select.appendChild(optionElement);
-      });
-      select.addEventListener("change", updateForm);
-      return select;
-    }
-
-    function updateForm() {
-      const selects = selectContainer.querySelectorAll("select");
-      const selectedOptions = Array.from(selects)
-        .map((s) => s.value)
-        .filter(Boolean);
-      let currentOptions = options;
-
-      // Find the index of the select that triggered the change event
-      const selectedIndex = Array.from(selects).indexOf(event.target);
-
-      // Remove all menus after the current one
-      for (let i = selects.length - 1; i > selectedIndex; i--) {
-        selectContainer.removeChild(selects[i]);
-      }
-
-      selectedOptions.forEach((option, index) => {
-        currentOptions = currentOptions[option];
-        if (currentOptions && Object.keys(currentOptions).length > 0) {
-          // Check if there are child options
-          if (index < selects.length - 1) {
-            // If not the last select element, update its options
-            selects[index + 1].innerHTML = "";
-            const newOptions = Object.keys(currentOptions);
-            newOptions.forEach((newOption) => {
-              const optionElement = document.createElement("option");
-              optionElement.value = newOption;
-              optionElement.textContent = newOption;
-              selects[index + 1].appendChild(optionElement);
-            });
-          } else {
-            // If it's the last select element, create a new one
-            const select = createSelect(Object.keys(currentOptions));
-            selectContainer.appendChild(select);
-          }
-        } else {
-          // If there are no child options, stop and print the result
-          printResult(selectedOptions);
-        }
-      });
-    }
-
-
-
-    function printResult(selectedOptions) {
-      resultText.textContent = selectedOptions;
-    }
-  </script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="scripts.js"></script>
 </body>
 
 </html>
