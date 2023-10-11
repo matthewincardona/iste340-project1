@@ -1,7 +1,9 @@
 :root {
-    --select-background: #d3d3d3;
+    --select-background: #e0e0e0;
+    --select-background--dark: #ed3563;
 }
 
+/* Animation made with https://www.gradient-animator.com/ */
 body {
     background: linear-gradient(50deg, #8484eb, #3e4fa5);
     background-size: 12000% 12000%;
@@ -27,9 +29,10 @@ body {
     100%{background-position:0% 84%}
 }
 
-h1, h2, h3, p {
+h1, h2, h3, p, #result {
     color: white;
     font-family: 'Gabarito', sans-serif;
+    text-align: center;
 }
 
 select {
@@ -39,8 +42,13 @@ select {
     padding: 8px 14px;
     border-radius: 5px;
     width: 150px;
-
   }
+
+  /* Style the last select menu differently */
+#selectContainer select:last-of-type {
+    background-color: var(--select-background--dark);
+    color: white;
+}
 
   select option {
     background-color: var(--select-background);
@@ -51,4 +59,11 @@ select {
   #selectContainer {
     display: flex;
     gap: 1em;
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  #result {
+    margin-top: 50px;
   }

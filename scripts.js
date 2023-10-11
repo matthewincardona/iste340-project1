@@ -5,13 +5,20 @@ let resultText = document.createTextNode("");
 result.appendChild(resultText);
 
 // Create the initial select menu when the page loads
-let initialOptions; // Declare initialOptions outside of the fetch function
+let initialOptions;
 let options;
+
+
+/* DO BROWSER DETECTION */
+if (!document.getElementById) {
+    // really old browser ;(
+    window.location = "legacy.html"; // Page telling them that their browser is garbage and suggesting a new one
+}
 
 fetch('data.json')
     .then(response => response.json())
     .then(data => {
-        initialOptions = Object.keys(data); // Assign the value inside the fetch callback
+        initialOptions = Object.keys(data); // Assign the value inside the fetch callback *magic*
         options = data;
         let select = createSelect(initialOptions);
         selectContainer.appendChild(select);
@@ -38,7 +45,8 @@ function createSelect(optionsList) {
         optionElement.textContent = option;
         select.appendChild(optionElement);
     });
-    select.addEventListener("change", updateForm);
+    select.setAttribute('onchange', 'updateForm()');
+    // select.addEventListener("change", updateForm);
     return select;
 }
 
@@ -72,19 +80,89 @@ function updateForm() {
                     selects[index + 1].appendChild(optionElement);
                 });
             } else {
+                saveToLocalStorage(selectedOptions);
                 // If it's the last select element, create a new one
                 let select = createSelect(Object.keys(currentOptions));
                 selectContainer.appendChild(select);
             }
         } else {
             // If there are no child options, stop and print the result
-            printResult(selectedOptions);
+            let replacedSelectionOptions = selectedOptions.toString().replace(/,/g, ' ');
+            printResult(replacedSelectionOptions);
         }
     });
 }
 
+function populateFromLocalStorage() {
 
+}
+
+function saveToLocalStorage(sessionOptions) {
+    console.log(sessionOptions);
+    // Store the json in localStorage as a string
+    var jsonString = JSON.stringify(sessionOptions);
+    localStorage.setItem("diveOptions", jsonString);
+}
 
 function printResult(selectedOptions) {
-    resultText.textContent = selectedOptions;
+    resultText.textContent = "You chose: " + selectedOptions;
 }
+
+// Animating the falling divers. Probably not very performant :)
+// I tried to add a check for when the user is off the page, using this, but it didn't work out:
+// https://stackoverflow.com/questions/68427135/can-i-use-javascript-do-detect-whether-a-user-is-on-another-open-tab-rather-tha
+const boxes = [];
+
+function createBox() {
+    const box = document.createElement('img');
+    box.src = "./diver.png";
+    box.style.width = '80px';
+    box.style.height = '80px';
+    box.style.position = 'absolute';
+    box.style.zIndex = -1;
+    document.body.appendChild(box);
+
+    const startPositionX = Math.random() * window.innerWidth;
+    const startPositionY = 0;
+    let positionY = startPositionY;
+
+    box.style.left = startPositionX + 'px';
+
+    function animate() {
+        positionY += 2; // Adjust the speed of falling here
+        box.style.top = positionY + 'px';
+
+        // Add rotation animation
+        box.style.transform = `rotate(${positionY}deg)`;
+
+        if (positionY < window.innerHeight) {
+            requestAnimationFrame(animate);
+        } else {
+            document.body.removeChild(box);
+            const index = boxes.indexOf(box);
+            boxes.splice(index, 1);
+        }
+    }
+
+    boxes.push(box);
+    animate();
+}
+
+
+function createRandomBox() {
+    createBox();
+    const nextCreationTime = Math.random() * 1400 + 800; // Random interval between 0.5s and 1.5s
+    setTimeout(createRandomBox, nextCreationTime);
+}
+
+createRandomBox(); // Start creating boxes
+
+function animateBoxes() {
+    for (const box of boxes) {
+        box.style.left = (parseFloat(box.style.left) + Math.random() - 0.5) + 'px';
+    }
+
+    requestAnimationFrame(animateBoxes);
+}
+
+animateBoxes();
