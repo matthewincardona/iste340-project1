@@ -157,4 +157,4 @@ function createRandomDiver() {
     setTimeout(createRandomDiver, nextCreationTime);
 }
 
-// createRandomDiver(); // Start creating divers
+createRandomDiver(); // Start creating divers
