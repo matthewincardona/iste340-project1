@@ -52,9 +52,7 @@ function createSelect(optionsList) {
 
 function updateForm() {
     let selects = selectContainer.querySelectorAll("select");
-    let selectedOptions = Array.from(selects)
-        .map((s) => s.value)
-        .filter(Boolean);
+    let selectedOptions = Array.from(selects).map((s) => s.value);
     let currentOptions = options;
 
     // Find the index of the select that triggered the change event
@@ -64,6 +62,9 @@ function updateForm() {
     for (let i = selects.length - 1; i > selectedIndex; i--) {
         selectContainer.removeChild(selects[i]);
     }
+
+    // Update the text content of the current select menu
+    selects[selectedIndex].value = event.target.value;
 
     selectedOptions.forEach((option, index) => {
         currentOptions = currentOptions[option];
@@ -87,11 +88,12 @@ function updateForm() {
             }
         } else {
             // If there are no child options, stop and print the result
-            let replacedSelectionOptions = selectedOptions.toString().replace(/,/g, ' ');
+            let replacedSelectionOptions = selectedOptions.join(' ');
             printResult(replacedSelectionOptions);
         }
     });
 }
+
 
 function populateFromLocalStorage() {
 
@@ -109,60 +111,50 @@ function printResult(selectedOptions) {
 }
 
 // Animating the falling divers. Probably not very performant :)
-// I tried to add a check for when the user is off the page, using this, but it didn't work out:
+// I tried to add a check for when the user is off the page, using this, but couldn't figure it out:
 // https://stackoverflow.com/questions/68427135/can-i-use-javascript-do-detect-whether-a-user-is-on-another-open-tab-rather-tha
-const boxes = [];
+const divers = [];
 
-function createBox() {
-    const box = document.createElement('img');
-    box.src = "./diver.png";
-    box.style.width = '80px';
-    box.style.height = '80px';
-    box.style.position = 'absolute';
-    box.style.zIndex = -1;
-    document.body.appendChild(box);
+function createDiver() {
+    const diver = document.createElement('img');
+    diver.src = "./diver.png";
+    diver.style.width = '80px';
+    diver.style.height = '80px';
+    diver.style.position = 'absolute';
+    diver.style.zIndex = -1;
+    document.body.appendChild(diver);
 
     const startPositionX = Math.random() * window.innerWidth;
     const startPositionY = 0;
     let positionY = startPositionY;
 
-    box.style.left = startPositionX + 'px';
+    diver.style.left = startPositionX + 'px';
 
     function animate() {
         positionY += 2; // Adjust the speed of falling here
-        box.style.top = positionY + 'px';
+        diver.style.top = positionY + 'px';
 
         // Add rotation animation
-        box.style.transform = `rotate(${positionY}deg)`;
+        diver.style.transform = `rotate(${positionY}deg)`;
 
         if (positionY < window.innerHeight) {
             requestAnimationFrame(animate);
         } else {
-            document.body.removeChild(box);
-            const index = boxes.indexOf(box);
-            boxes.splice(index, 1);
+            document.body.removeChild(diver);
+            const index = divers.indexOf(diver);
+            divers.splice(index, 1);
         }
     }
 
-    boxes.push(box);
+    divers.push(diver);
     animate();
 }
 
 
-function createRandomBox() {
-    createBox();
+function createRandomDiver() {
+    createDiver();
     const nextCreationTime = Math.random() * 1400 + 800; // Random interval between 0.5s and 1.5s
-    setTimeout(createRandomBox, nextCreationTime);
+    setTimeout(createRandomDiver, nextCreationTime);
 }
 
-createRandomBox(); // Start creating boxes
-
-function animateBoxes() {
-    for (const box of boxes) {
-        box.style.left = (parseFloat(box.style.left) + Math.random() - 0.5) + 'px';
-    }
-
-    requestAnimationFrame(animateBoxes);
-}
-
-animateBoxes();
+// createRandomDiver(); // Start creating divers
