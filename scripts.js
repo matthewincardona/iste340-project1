@@ -5,109 +5,90 @@ let resultText = document.createTextNode("");
 result.appendChild(resultText);
 
 // Create the initial select menu when the page loads
-let initialOptions;
 let options;
-
 
 /* DO BROWSER DETECTION */
 if (!document.getElementById) {
-    // really old browser ;(
-    window.location = "legacy.html"; // Page telling them that their browser is garbage and suggesting a new one
+  // really old browser ;(
+  window.location = "legacy.html"; // Page telling them that their browser is garbage and suggesting a new one
 }
 
-fetch('data.json')
-    .then(response => response.json())
-    .then(data => {
-        initialOptions = Object.keys(data); // Assign the value inside the fetch callback *magic*
-        options = data;
-        let select = createSelect(initialOptions);
-        selectContainer.appendChild(select);
-        console.log(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+fetch("data.json")
+  .then((response) => response.json())
+  .then((data) => {
+    options = data;
+    let select = new SelectCreator(options);
+    selectContainer.appendChild(select.render());
+    console.log(data);
+  })
+  .catch((error) => {
+    console.error("Error:", error);
+  });
 
+// Create and fill select menus
+function SelectCreator(data) {
+  this.data = data;
+  this.selectedIndex = 0;
+  this.selectedOptions = [];
 
-// Function to create and populate select menus
-function createSelect(optionsList) {
+  this.render = function () {
     let select = document.createElement("select");
 
     // Add a blank option as the initial option
     let blankOption = document.createElement("option");
     blankOption.value = "";
     blankOption.textContent = "Select an option";
-    select.appendChild(blankOption); // Ad a blank option to each select menu
+    select.appendChild(blankOption);
 
+    let optionsList = Object.keys(this.data);
     optionsList.forEach((option) => {
-        let optionElement = document.createElement("option");
-        optionElement.value = option;
-        optionElement.textContent = option;
-        select.appendChild(optionElement);
+      let optionElement = document.createElement("option");
+      optionElement.value = option;
+      optionElement.textContent = option;
+      select.appendChild(optionElement);
     });
-    select.setAttribute('onchange', 'updateForm()');
-    // select.addEventListener("change", updateForm);
+
+    select.addEventListener("change", () => this.updateForm(select));
     return select;
-}
+  };
 
-function updateForm() {
-    let selects = selectContainer.querySelectorAll("select");
-    let selectedOptions = Array.from(selects).map((s) => s.value);
-    let currentOptions = options;
-
-    // Find the index of the select that triggered the change event
-    let selectedIndex = Array.from(selects).indexOf(event.target);
+  this.updateForm = function (select) {
+    this.selectedIndex = this.selectedOptions.length;
+    this.selectedOptions.push(select.value);
+    let currentOptions = this.data;
 
     // Remove all menus after the current one
-    for (let i = selects.length - 1; i > selectedIndex; i--) {
-        selectContainer.removeChild(selects[i]);
+    while (selectContainer.lastChild && selectContainer.lastChild !== select) {
+      selectContainer.removeChild(selectContainer.lastChild);
     }
 
-    // Update the text content of the current select menu
-    selects[selectedIndex].value = event.target.value;
+    currentOptions = currentOptions[select.value];
 
-    selectedOptions.forEach((option, index) => {
-        currentOptions = currentOptions[option];
-        if (currentOptions && Object.keys(currentOptions).length > 0) {
-            // Check if there are child options
-            if (index < selects.length - 1) {
-                // If it's not the last select element, update its options
-                selects[index + 1].innerHTML = "";
-                let newOptions = Object.keys(currentOptions);
-                newOptions.forEach((newOption) => {
-                    let optionElement = document.createElement("option");
-                    optionElement.value = newOption;
-                    optionElement.textContent = newOption;
-                    selects[index + 1].appendChild(optionElement);
-                });
-            } else {
-                saveToLocalStorage(selectedOptions);
-                // If it's the last select element, create a new one
-                let select = createSelect(Object.keys(currentOptions));
-                selectContainer.appendChild(select);
-            }
-        } else {
-            // If there are no child options, stop and print the result
-            let replacedSelectionOptions = selectedOptions.join(' ');
-            printResult(replacedSelectionOptions);
-        }
-    });
-}
+    if (currentOptions && Object.keys(currentOptions).length > 0) {
+      // Check if there are child options
+      let newOptions = Object.keys(currentOptions);
+      let newSelect = new SelectCreator(currentOptions);
 
+      // If it's not the last select element, update its options
+      selectContainer.appendChild(newSelect.render());
+    } else {
+      this.saveToLocalStorage();
+      // If it's the last select element, print the result
+      let replacedSelectionOptions = this.selectedOptions.join(" ");
+      this.printResult(replacedSelectionOptions);
+    }
+  };
 
-function populateFromLocalStorage() {
-
-}
-
-function saveToLocalStorage(sessionOptions) {
-    console.log(sessionOptions);
+  this.saveToLocalStorage = function () {
+    console.log(this.selectedOptions);
     // Store the json in localStorage as a string
-    var jsonString = JSON.stringify(sessionOptions);
+    var jsonString = JSON.stringify(this.selectedOptions);
     localStorage.setItem("diveOptions", jsonString);
-}
+  };
 
-function printResult(selectedOptions) {
+  this.printResult = function (selectedOptions) {
     resultText.textContent = "You chose: " + selectedOptions;
+  };
 }
 
 // Animating the falling divers. Probably not very performant :)
@@ -116,45 +97,44 @@ function printResult(selectedOptions) {
 const divers = [];
 
 function createDiver() {
-    const diver = document.createElement('img');
-    diver.src = "./diver.png";
-    diver.style.width = '80px';
-    diver.style.height = '80px';
-    diver.style.position = 'absolute';
-    diver.style.zIndex = -1;
-    document.body.appendChild(diver);
+  const diver = document.createElement("img");
+  diver.src = "./diver.png";
+  diver.style.width = "80px";
+  diver.style.height = "80px";
+  diver.style.position = "absolute";
+  diver.style.zIndex = -1;
+  document.body.appendChild(diver);
 
-    const startPositionX = Math.random() * window.innerWidth;
-    const startPositionY = 0;
-    let positionY = startPositionY;
+  const startPositionX = Math.random() * window.innerWidth;
+  const startPositionY = 0;
+  let positionY = startPositionY;
 
-    diver.style.left = startPositionX + 'px';
+  diver.style.left = startPositionX + "px";
 
-    function animate() {
-        positionY += 2; // Adjust the speed of falling here
-        diver.style.top = positionY + 'px';
+  function animate() {
+    positionY += 2; // Adjust the speed of falling here
+    diver.style.top = positionY + "px";
 
-        // Add rotation animation
-        diver.style.transform = `rotate(${positionY}deg)`;
+    // Add rotation animation
+    diver.style.transform = `rotate(${positionY}deg)`;
 
-        if (positionY < window.innerHeight) {
-            requestAnimationFrame(animate);
-        } else {
-            document.body.removeChild(diver);
-            const index = divers.indexOf(diver);
-            divers.splice(index, 1);
-        }
+    if (positionY < window.innerHeight) {
+      requestAnimationFrame(animate);
+    } else {
+      document.body.removeChild(diver);
+      const index = divers.indexOf(diver);
+      divers.splice(index, 1);
     }
+  }
 
-    divers.push(diver);
-    animate();
+  divers.push(diver);
+  animate();
 }
 
-
 function createRandomDiver() {
-    createDiver();
-    const nextCreationTime = Math.random() * 1400 + 800; // Random interval between 0.5s and 1.5s
-    setTimeout(createRandomDiver, nextCreationTime);
+  createDiver();
+  const nextCreationTime = Math.random() * 1400 + 800; // Random interval between 0.5s and 1.5s
+  setTimeout(createRandomDiver, nextCreationTime);
 }
 
 createRandomDiver(); // Start creating divers
